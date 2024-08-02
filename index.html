@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MRZ Detection with OpenCV.js</title>
+    <script async src="opencv.js"></script>
+    <script>
+      function detectMRZ(image) {
+        // Resize the image
+        let dsize = new cv.Size(image.cols, 600);
+        cv.resize(image, image, dsize, 0, 0, cv.INTER_AREA);
+
+        // Convert to grayscale
+        let gray = new cv.Mat();
+        cv.cvtColor(image, gray, cv.COLOR_BGR2GRAY);
+
+        // Initialize structuring elements
+        let rectKernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(13, 5));
+        let sqKernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(21, 21));
+
+        // Apply Gaussian blur
+        cv.GaussianBlur(gray, gray, new cv.Size(3, 3), 0);
+
+        cv.imshow('cv', gray)
+        // Apply blackhat operation
+        let blackhat = new cv.Mat();
+        cv.morphologyEx(gray, blackhat, cv.MORPH_BLACKHAT, rectKernel);
+
+        // cv.imshow('cv', blackhat)
+
+        // Compute the Scharr gradient
+        let grad = new cv.Mat();
+        cv.Sobel(blackhat, grad, cv.CV_32F, 1, 0, -1);
+        cv.convertScaleAbs(grad, grad);
+
+        // Normalize the gradient
+        let minMax = cv.minMaxLoc(grad);
+        cv.normalize(grad, grad, 0, 255, cv.NORM_MINMAX);
+        grad.convertTo(grad, cv.CV_8U);
+
+        // Close gaps using the rectangular kernel
+        cv.morphologyEx(grad, grad, cv.MORPH_CLOSE, rectKernel);
+
+        // Threshold the image using Otsu's method
+        let thresh = new cv.Mat();
+        cv.threshold(grad, thresh, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU);
+
+        // Close gaps using the square kernel and erode
+        cv.morphologyEx(thresh, thresh, cv.MORPH_CLOSE, sqKernel);
+        cv.erode(thresh, thresh, new cv.Mat(), new cv.Point(-1, -1), 4);
+
+        // Remove border noise
+        let p = Math.floor(image.cols * 0.05);
+        let rect = new cv.Rect(0, 0, p, thresh.rows);
+        let roi1 = thresh.roi(rect);
+        roi1.setTo(new cv.Scalar(0));
+        roi1.delete();
+
+        rect = new cv.Rect(thresh.cols - p, 0, p, thresh.rows);
+        let roi2 = thresh.roi(rect);
+        roi2.setTo(new cv.Scalar(0));
+        roi2.delete();
+
+        // Find contours
+        let contours = new cv.MatVector();
+        let hierarchy = new cv.Mat();
+        cv.findContours(thresh, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+        let mrzBox = null;
+
+        for (let i = 0; i < contours.size(); ++i) {
+          let cnt = contours.get(i);
+          let rect = cv.boundingRect(cnt);
+          let x = rect.x;
+          let y = rect.y;
+          let w = rect.width;
+          let h = rect.height;
+
+          let ar = w / h;
+          let crWidth = w / gray.cols;
+
+          if (ar > 4 && crWidth > 0.7) {
+            mrzBox = { x: x, y: y, w: w, h: h };
+            break;
+          }
+        }
+
+        if (mrzBox === null) {
+          console.log("[INFO] MRZ could not be found");
+          return;
+        }
+
+        let { x, y, w, h } = mrzBox;
+        let pX = Math.floor((x + w) * 0.03);
+        let pY = Math.floor((y + h) * 0.03);
+        x -= pX;
+        y -= pY;
+        w += pX * 2;
+        h += pY * 2;
+
+        // Extract the MRZ region
+        let mrz = image.roi(new cv.Rect(x, y, w, h));
+
+        console.log({ x, y, w, h });
+
+        const cc = document.getElementById('cv').getContext('2d');
+        cc.strokeStyle = 'red';
+        cc.rect(x, y, w, h);
+        cc.stroke();
+
+
+        // The `read_mrz` function needs to be implemented using a suitable JavaScript library
+        let mrzText = read_mrz(mrz);
+
+        console.log(mrzText);
+
+        // Cleanup
+        gray.delete();
+        blackhat.delete();
+        grad.delete();
+        thresh.delete();
+        contours.delete();
+        hierarchy.delete();
+      }
+
+      function read_mrz(mrz) {
+        // Implement MRZ reading logic using OCR library like Tesseract.js
+        return "MRZ text (placeholder)";
+      }
+
+      // Example usage:
+      document.addEventListener("DOMContentLoaded", function () {
+        let inputElement = document.getElementById("fileInput");
+        inputElement.addEventListener("change", function (e) {
+          let file = e.target.files[0];
+          let reader = new FileReader();
+          reader.onload = function (event) {
+            let imgElement = new Image();
+            imgElement.onload = function () {
+              let src = cv.imread(imgElement);
+              cv.imshow('cv', src)
+              detectMRZ(src);
+              src.delete();
+            };
+            imgElement.src = event.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <input type="file" id="fileInput" accept="image/*" />
+    <br>
+    <canvas id="cv"></canvas>
+  </body>
+</html>
