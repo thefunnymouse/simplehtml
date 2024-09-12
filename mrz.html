@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.2.3000/dist/dcv.bundle.js"></script>
   </head>
   <body>
-    <div id="cam-view-cont"></div>
+    <div id="cam-view-cont" style="width: 500px; height: 300px"></div>
 
     <pre><code id="result"></code></pre>
     <script>
@@ -33,7 +33,8 @@
         await cvRouter.startCapturing("ReadPassport");
 
         const resultReceiver = new Dynamsoft.CVR.CapturedResultReceiver();
-        resultReceiver.onCapturedResultReceived = result => {
+        resultReceiver.onCapturedResultReceived = async result => {
+          await cvRouter.stopCapturing();
           const recognizedResults = result.textLineResultItems;
           const parsedResults = result.parsedResultItems;
           // Process the results according to your needs.
