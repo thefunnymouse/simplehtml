@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Demo Dynamsoft MRZ Scanner</title>
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.2.3000/dist/dcv.bundle.js"></script>
+    <style>
+      .dls-license-mask {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div id="cam-view-cont" style="width: 500px; height: 300px"></div>
 
-    <pre><code id="result" style="height: 400px; width: 90%; overflow: auto;"></code></pre>
+    <pre style="height: 400px; width: 90%; overflow: auto"><code id="result" ></code></pre>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
