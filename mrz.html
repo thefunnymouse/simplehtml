@@ -44,8 +44,7 @@
           await cvRouter.stopCapturing();
           // Process the results according to your needs.
 
-          const ret = JSON.parse(parsedResults.jsonString);
-          document.getElementById("result").innerHTML = JSON.stringify(ret, null, "  ");
+          document.getElementById("result").innerHTML = JSON.stringify(parsedResults, null, "  ");
         };
         await cvRouter.addResultReceiver(resultReceiver);
       }
