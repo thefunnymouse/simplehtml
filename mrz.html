@@ -34,6 +34,10 @@
 
         const resultReceiver = new Dynamsoft.CVR.CapturedResultReceiver();
         resultReceiver.onCapturedResultReceived = async result => {
+          if (!result) {
+            return;
+          }
+
           await cvRouter.stopCapturing();
           const recognizedResults = result.textLineResultItems;
           const parsedResults = result.parsedResultItems;
