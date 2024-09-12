@@ -43,15 +43,18 @@
 
           try {
             await cvRouter.stopCapturing();
-            await cameraEnhancer.close();
           } catch (e) {}
           // Process the results according to your needs.
 
           try {
-            parsedResults.map(rs => JSON.stringify(JSON.parse(rs.jsonString), null, " ")).join("\n");
+            document.getElementById("result").innerHTML = parsedResults
+              .map(rs => JSON.stringify(JSON.parse(rs.jsonString), null, " "))
+              .join("\n");
           } catch (e) {
             document.getElementById("result").innerHTML = JSON.stringify(parsedResults, null, "  ");
           }
+
+          await cameraEnhancer.close();
         };
         await cvRouter.addResultReceiver(resultReceiver);
       }
