@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo Dynamsoft MRZ Scanner</title>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-capture-vision-bundle@2.2.3000/dist/dcv.bundle.js"></script>
+  </head>
+  <body>
+    <div id="cam-view-cont"></div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
+        Dynamsoft.Core.CoreModule.loadWasm(["DLR", "DCP"]);
+        Dynamsoft.DCP.CodeParserModule.loadSpec("MRTD_TD3_PASSPORT");
+        Dynamsoft.DCP.CodeParserModule.loadSpec("MRTD_TD1_ID");
+        Dynamsoft.DCP.CodeParserModule.loadSpec("MRTD_TD2_ID");
+        Dynamsoft.DLR.LabelRecognizerModule.loadRecognitionData("MRZ");
+      });
+
+      const cameraViewContainer = document.getElementById("cam-view-cont");
+      async function main() {
+        const cvRouter = await Dynamsoft.CVR.CaptureVisionRouter.createInstance();
+        await cvRouter.initSettings("./template.json");
+
+        const cameraView = await Dynamsoft.DCE.CameraView.createInstance(cameraViewContainer);
+        const cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(cameraView);
+        cvRouter.setInput(cameraEnhancer);
+
+        await cameraEnhancer.open();
+        await cvRouter.startCapturing("ReadPassport");
+      }
+
+      window.addEventListener("load", main);
+    </script>
+  </body>
+</html>
