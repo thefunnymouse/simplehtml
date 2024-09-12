@@ -52,9 +52,9 @@
           // Process the results according to your needs.
 
           try {
-            document.getElementById("result").innerHTML = parsedResults
-              .map(rs => JSON.stringify(JSON.parse(rs.jsonString), null, " "))
-              .join("\n");
+            const text = parsedResults.map(rs => JSON.stringify(JSON.parse(rs.jsonString), null, " ")).join("\n");
+            alert(text);
+            document.getElementById("result").innerHTML = text;
           } catch (e) {
             document.getElementById("result").innerHTML = JSON.stringify(parsedResults, null, "  ");
           }
