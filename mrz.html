@@ -8,6 +8,8 @@
   </head>
   <body>
     <div id="cam-view-cont"></div>
+
+    <pre><code id="result"></code></pre>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
@@ -29,6 +31,16 @@
 
         await cameraEnhancer.open();
         await cvRouter.startCapturing("ReadPassport");
+
+        const resultReceiver = new Dynamsoft.CVR.CapturedResultReceiver();
+        resultReceiver.onCapturedResultReceived = result => {
+          const recognizedResults = result.textLineResultItems;
+          const parsedResults = result.parsedResultItems;
+          // Process the results according to your needs.
+
+          document.getElementById("result").innerHTML = JSON.stringify(parsedResults, null, "  ");
+        };
+        await cvRouter.addResultReceiver(resultReceiver);
       }
 
       window.addEventListener("load", main);
