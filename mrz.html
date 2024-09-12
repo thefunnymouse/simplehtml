@@ -28,19 +28,20 @@
         const cameraView = await Dynamsoft.DCE.CameraView.createInstance(cameraViewContainer);
         const cameraEnhancer = await Dynamsoft.DCE.CameraEnhancer.createInstance(cameraView);
         cvRouter.setInput(cameraEnhancer);
+        await cameraEnhancer.setResolution({ width: 600, height: 1000 });
 
         await cameraEnhancer.open();
         await cvRouter.startCapturing("ReadPassport");
 
         const resultReceiver = new Dynamsoft.CVR.CapturedResultReceiver();
         resultReceiver.onCapturedResultReceived = async result => {
-          if (!result) {
+          const recognizedResults = result.textLineResultItems;
+          const parsedResults = result.parsedResultItems;
+          if (!parsedResults) {
             return;
           }
 
           await cvRouter.stopCapturing();
-          const recognizedResults = result.textLineResultItems;
-          const parsedResults = result.parsedResultItems;
           // Process the results according to your needs.
 
           document.getElementById("result").innerHTML = JSON.stringify(parsedResults, null, "  ");
