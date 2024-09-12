@@ -14,11 +14,6 @@
   <body>
     <div id="cam-view-cont" style="width: 95%; height: 300px"></div>
 
-    <pre
-      id="result"
-      style="height: 400px; width: 90%; overflow: scroll; border: 1px dashed gray; font-family: monospace"
-    >
-  </pre>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         Dynamsoft.License.LicenseManager.initLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9");
@@ -50,20 +45,15 @@
             return;
           }
 
-          try {
-            await cvRouter.stopCapturing();
-          } catch (e) {}
-          // Process the results according to your needs.
-
-          try {
-            const text = parsedResults.map(rs => JSON.stringify(JSON.parse(rs.jsonString), null, " ")).join("\n");
-            alert(text);
-            document.getElementById("result").innerHTML = text;
-          } catch (e) {
-            document.getElementById("result").innerHTML = JSON.stringify(parsedResults, null, "  ");
-          }
-
+          await cvRouter.stopCapturing();
           await cameraEnhancer.close();
+
+          try {
+            const text = parsedResults.map(rs => JSON.stringify(JSON.parse(rs.jsonString))).join("\n");
+            alert(text);
+          } catch (e) {
+            alert(JSON.stringify(parsedResults));
+          }
         };
         await cvRouter.addResultReceiver(resultReceiver);
       }
