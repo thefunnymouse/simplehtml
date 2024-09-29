@@ -31,8 +31,7 @@
 
       async function loadV() {
   const s = await navigator.mediaDevices
-    .getUserMedia({ video: { facingMode: "environment", width: 400, height: 600 }, audio: false })
-    .catch(e => alert(e.toString()));
+    .getUserMedia({ video: { facingMode: "environment", width: 400, height: 600 }, audio: false });
   v.srcObject = s;
 };
       loadV();
