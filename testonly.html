@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body>
+    <div id="app">
+      <button id="play">Play</button>
+      <video src="" id="vid" muted autoplay playsinline style="width: 300px; border: 1px dashed blue;"></video>
+    </div>
+    <script></script>
+    <script type="module" src="/main.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+        eruda.init();
+    </script>
+
+    <script>
+      
+const v = document.getElementById("vid");
+document.getElementById("play").addEventListener("click", async () => {
+  const s = await navigator.mediaDevices
+    .getUserMedia({ video: { facingMode: "environment", width: 400, height: 600 }, audio: false })
+    .catch(e => alert(e.toString()));
+  v.srcObject = s;
+});
+    </script>
+  </body>
+</html>
