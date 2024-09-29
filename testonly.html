@@ -16,10 +16,10 @@
     <script>
         document.getElementById('err').innerText = 'fsdafsda';
       addEventListener("error", (event) => {
-        document.getElementById('err').innerText = event.toString();
+        document.getElementById('err').innerText = event.message;
       });
       addEventListener("unhandledrejection", (event) => {
-        document.getElementById('err').innerText = event.toString();
+        document.getElementById('err').innerText = event.message;
       });
     </script>
     <script src="//cdn.jsdelivr.net/npm/eruda"></script>
