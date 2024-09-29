@@ -14,6 +14,7 @@
       <div id="err"></div>
     </div>
     <script>
+        document.getElementById('err').innerText = 'fsdafsda';
       addEventListener("error", (event) => {
         document.getElementById('err').innerText = event.toString();
       });
