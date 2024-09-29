@@ -14,7 +14,12 @@
       <div id="err"></div>
     </div>
     <script>
-
+      addEventListener("error", (event) => {
+        document.getElementById('err').innerText = event.toString();
+      });
+      addEventListener("unhandledrejection", (event) => {
+        document.getElementById('err').innerText = event.toString();
+      });
     </script>
     <script src="//cdn.jsdelivr.net/npm/eruda"></script>
     <script>
